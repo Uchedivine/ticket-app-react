@@ -1,23 +1,72 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useEffect } from 'react';
+import LandingPage from './components/LandingPage';
+import AuthPage from './components/AuthPage';
+import Dashboard from './components/Dashboard';
+import TicketManagement from './components/TicketManagement';
 
 function App() {
+  const [currentPage, setCurrentPage] = useState('landing');
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  // Check if user is already logged in
+  useEffect(() => {
+    const session = localStorage.getItem('ticketapp_session');
+    if (session) {
+      setIsAuthenticated(true);
+      setCurrentPage('dashboard');
+    }
+  }, []);
+
+  const handleGetStarted = () => {
+    setCurrentPage('auth');
+  };
+
+  const handleLogin = () => {
+    setCurrentPage('auth');
+  };
+
+  const handleAuthSuccess = () => {
+    setIsAuthenticated(true);
+    setCurrentPage('dashboard');
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('ticketapp_session');
+    setIsAuthenticated(false);
+    setCurrentPage('landing');
+  };
+
+  const handleNavigateToTickets = () => {
+    setCurrentPage('tickets');
+  };
+
+  const handleBackToDashboard = () => {
+    setCurrentPage('dashboard');
+  };
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      {currentPage === 'landing' && (
+        <LandingPage 
+          onGetStarted={handleGetStarted}
+          onLogin={handleLogin}
+        />
+      )}
+      
+      {currentPage === 'auth' && (
+        <AuthPage onAuthSuccess={handleAuthSuccess} />
+      )}
+
+      {currentPage === 'dashboard' && (
+        <Dashboard 
+          onLogout={handleLogout}
+          onNavigateToTickets={handleNavigateToTickets}
+        />
+      )}
+
+      {currentPage === 'tickets' && (
+        <TicketManagement onBackToDashboard={handleBackToDashboard} />
+      )}
     </div>
   );
 }
